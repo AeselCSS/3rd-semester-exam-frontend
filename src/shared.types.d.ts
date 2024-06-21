@@ -34,6 +34,8 @@ export interface ResultResponseDTO {
     formattedValue: string;
     participantId: number;
     disciplineId: number;
+    participantName: string;
+    disciplineName: string;
 }
 
 export interface DisciplineRequestDTO {

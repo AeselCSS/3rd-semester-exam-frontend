@@ -1,9 +1,11 @@
-import { ParticipantRequestDTO, ParticipantResponseDTO,} from "../shared.types";
-import {AgeGroup, Gender} from "../enums.ts";
-import toast from "react-hot-toast";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ParticipantRequestDTO, ParticipantResponseDTO } from '../shared.types';
+import { AgeGroup, Gender } from '../enums';
+import toast from 'react-hot-toast';
+import cleanFilters from '../utils/cleanFilters';
 
 const fetchAllParticipants = async (params?: {
+    search?: string;
     gender?: Gender;
     ageGroup?: AgeGroup;
     club?: string;
@@ -11,7 +13,7 @@ const fetchAllParticipants = async (params?: {
     sortBy?: string;
     sortDirection?: 'asc' | 'desc';
 }): Promise<ParticipantResponseDTO[]> => {
-    const query = new URLSearchParams(params as Record<string, string>).toString();
+    const query = new URLSearchParams(cleanFilters(params || {}) as Record<string, string>).toString();
     const response = await fetch(`http://localhost:8080/participant?${query}`);
     if (!response.ok) {
         toast.error("Failed to fetch participants");
@@ -38,10 +40,81 @@ const fetchParticipantByName = async (name: string): Promise<ParticipantResponse
     return response.json();
 };
 
+const createParticipant = async (participant: ParticipantRequestDTO): Promise<ParticipantResponseDTO> => {
+    const response = await fetch('http://localhost:8080/participant', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(participant),
+    });
+    if (!response.ok) {
+        toast.error('Failed to create participant');
+        throw new Error('Failed to create participant');
+    }
+    return response.json();
+};
+
+const updateParticipant = async ({ id, data }: { id: number, data: ParticipantRequestDTO }): Promise<ParticipantResponseDTO> => {
+    const response = await fetch(`http://localhost:8080/participant/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        toast.error('Failed to update participant');
+        throw new Error('Failed to update participant');
+    }
+    return response.json();
+};
+
+const deleteParticipant = async (id: number): Promise<void> => {
+    const response = await fetch(`http://localhost:8080/participant/${id}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        toast.error('Failed to delete participant');
+        throw new Error('Failed to delete participant');
+    }
+};
+
+const addDiscipline = async ({ id, discipline }: { id: number, discipline: string }): Promise<ParticipantResponseDTO> => {
+    const response = await fetch(`http://localhost:8080/participant/${id}/addDiscipline`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: discipline }),
+    });
+    if (!response.ok) {
+        toast.error('Failed to add discipline to participant');
+        throw new Error('Failed to add discipline to participant');
+    }
+    return response.json();
+};
+
+const removeDiscipline = async ({ id, discipline }: { id: number, discipline: string }): Promise<ParticipantResponseDTO> => {
+    const response = await fetch(`http://localhost:8080/participant/${id}/removeDiscipline`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: discipline }),
+    });
+    if (!response.ok) {
+        toast.error('Failed to remove discipline from participant');
+        throw new Error('Failed to remove discipline from participant');
+    }
+    return response.json();
+};
+
 const useParticipant = () => {
     const queryClient = useQueryClient();
 
     const useParticipantsQuery = (params?: {
+        search?: string;
         gender?: Gender;
         ageGroup?: AgeGroup;
         club?: string;
@@ -49,113 +122,59 @@ const useParticipant = () => {
         sortBy?: string;
         sortDirection?: 'asc' | 'desc';
     }) => useQuery<ParticipantResponseDTO[], Error>({
-        queryKey: ["participants", params],
+        queryKey: ['participants', params],
         queryFn: () => fetchAllParticipants(params),
     });
 
+
     const useParticipantByIdQuery = (id: number) => useQuery<ParticipantResponseDTO, Error>({
-        queryKey: ["participant", id],
+        queryKey: ['participant', id],
         queryFn: () => fetchParticipantById(id),
     });
 
     const useParticipantByNameQuery = (name: string) => useQuery<ParticipantResponseDTO, Error>({
-        queryKey: ["participant", name],
+        queryKey: ['participant', name],
         queryFn: () => fetchParticipantByName(name),
     });
 
     const useCreateParticipantMutation = () => useMutation<ParticipantResponseDTO, Error, ParticipantRequestDTO>({
-        mutationFn: async (newParticipant: ParticipantRequestDTO) => {
-            const response = await fetch("http://localhost:8080/participant", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(newParticipant),
-            });
-            if (!response.ok) {
-                toast.error("Failed to create participant");
-                throw new Error("Failed to create participant");
-            }
-            return response.json();
-        },
+        mutationFn: createParticipant,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["participants"] });
-        }
+            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            toast.success('Participant created successfully');
+        },
     });
 
     const useUpdateParticipantMutation = () => useMutation<ParticipantResponseDTO, Error, { id: number, data: ParticipantRequestDTO }>({
-        mutationFn: async ({ id, data }) => {
-            const response = await fetch(`http://localhost:8080/participant/${id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-            if (!response.ok) {
-                toast.error("Failed to update participant");
-                throw new Error("Failed to update participant");
-            }
-            return response.json();
-        },
+        mutationFn: updateParticipant,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["participants"] });
-        }
+            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            toast.success('Participant updated successfully');
+        },
     });
 
     const useDeleteParticipantMutation = () => useMutation<void, Error, number>({
-        mutationFn: async (id: number) => {
-            const response = await fetch(`http://localhost:8080/participant/${id}`, {
-                method: "DELETE",
-            });
-            if (!response.ok) {
-                toast.error("Failed to delete participant");
-                throw new Error("Failed to delete participant");
-            }
-        },
+        mutationFn: deleteParticipant,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["participants"] });
-        }
+            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            toast.success('Participant deleted successfully');
+        },
     });
 
     const useAddDisciplineMutation = () => useMutation<ParticipantResponseDTO, Error, { id: number, discipline: string }>({
-        mutationFn: async ({ id, discipline }) => {
-            const response = await fetch(`http://localhost:8080/participant/${id}/addDiscipline`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name: discipline }),
-            });
-            if (!response.ok) {
-                toast.error("Failed to add discipline to participant");
-                throw new Error("Failed to add discipline to participant");
-            }
-            return response.json();
-        },
+        mutationFn: addDiscipline,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["participants"] });
-        }
+            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            toast.success('Discipline added successfully');
+        },
     });
 
     const useRemoveDisciplineMutation = () => useMutation<ParticipantResponseDTO, Error, { id: number, discipline: string }>({
-        mutationFn: async ({ id, discipline }) => {
-            const response = await fetch(`http://localhost:8080/participant/${id}/removeDiscipline`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name: discipline }),
-            });
-            if (!response.ok) {
-                toast.error("Failed to remove discipline from participant");
-                throw new Error("Failed to remove discipline from participant");
-            }
-            return response.json();
-        },
+        mutationFn: removeDiscipline,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["participants"] });
-        }
+            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            toast.success('Discipline removed successfully');
+        },
     });
 
     return {
