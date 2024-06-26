@@ -1,10 +1,13 @@
-import React from 'react';
+import { useState } from 'react';
 import useResult from '../hooks/useResult';
 import LoadingSpinner from './LoadingSpinner';
 import ResultForm from './ResultForm';
 import Modal from './Modal';
 import { AgeGroup, Gender } from "../enums";
 import { ResultResponseDTO } from '../shared.types';
+import Button from '../components/Button';
+import toast from "react-hot-toast";
+import formatDate from "../utils/formatDate.ts"; // Import the Button component
 
 interface ResultTableProps {
     filters: {
@@ -14,15 +17,15 @@ interface ResultTableProps {
     };
 }
 
-const ResultTable: React.FC<ResultTableProps> = ({ filters }) => {
+const ResultTable = ({ filters }:ResultTableProps) => {
     const { useResultsByDisciplineQuery, useDeleteResultMutation } = useResult();
     const { data: results, error, isLoading } = useResultsByDisciplineQuery(filters);
     const deleteMutation = useDeleteResultMutation();
 
-    const [selectedResultId, setSelectedResultId] = React.useState<number | null>(null);
-    const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+    const [selectedResultId, setSelectedResultId] = useState<number | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const handleRowClick = (id: number) => {
+    const handleEdit = (id: number) => {
         setSelectedResultId(id);
         setIsEditModalOpen(true);
     };
@@ -30,10 +33,10 @@ const ResultTable: React.FC<ResultTableProps> = ({ filters }) => {
     const handleDelete = (id: number) => {
         deleteMutation.mutate(id, {
             onSuccess: () => {
-                console.log(`Result with ID ${id} deleted successfully`);
+                toast.success('Result deleted successfully');
             },
             onError: (error) => {
-                console.error(`Failed to delete result with ID ${id}`, error);
+                toast.error('Error deleting result: ' + error.message);
             }
         });
     };
@@ -43,6 +46,9 @@ const ResultTable: React.FC<ResultTableProps> = ({ filters }) => {
         setIsEditModalOpen(false);
     };
 
+    const tableHeaderStyle = "py-2 px-4 border-b text-left";
+    const tableRowStyle = "py-2 px-4 border-b text-left";
+
     if (isLoading) {
         return <LoadingSpinner />;
     }
@@ -51,38 +57,46 @@ const ResultTable: React.FC<ResultTableProps> = ({ filters }) => {
         return <div className="text-red-500">Error: {error.message}</div>;
     }
 
+    if(results?.length === 0) {
+        return <div className="text-slate-700">No results found</div>;
+    }
+
     return (
-        <div className="container mx-auto p-4">
+        <div className="container p-4 mx-auto">
             <h1 className="text-2xl font-bold mb-4">Results</h1>
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
+                <table className="min-w-fit bg-white border border-gray-200 table-auto">
                     <thead className="bg-gray-100">
                     <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Participant</th>
-                        <th className="py-2 px-4 border-b">Discipline</th>
-                        <th className="py-2 px-4 border-b">Result Type</th>
-                        <th className="py-2 px-4 border-b">Result</th>
-                        <th className="py-2 px-4 border-b">Date</th>
-                        <th className="py-2 px-4 border-b">Actions</th>
+                        <th className= {tableHeaderStyle}>Participant</th>
+                        <th className= {tableHeaderStyle}>Discipline</th>
+                        <th className= {tableHeaderStyle}>Result</th>
+                        <th className= {tableHeaderStyle}>Date</th>
+                        <th className= "py-2 px-4 border-b text-center">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     {results?.map((result: ResultResponseDTO) => (
                         <tr
                             key={result.id}
-                            className="hover:bg-gray-50 cursor-pointer"
-                            onClick={() => handleRowClick(result.id)}
+                            className="hover:bg-gray-100 cursor-pointer"
                         >
-                            <td className="py-2 px-4 border-b">{result.id}</td>
-                            <td className="py-2 px-4 border-b">{result.participantName}</td>
-                            <td className="py-2 px-4 border-b">{result.disciplineName}</td>
-                            <td className="py-2 px-4 border-b">{result.resultType}</td>
-                            <td className="py-2 px-4 border-b">{result.formattedValue}</td>
-                            <td className="py-2 px-4 border-b">{result.date}</td>
-                            <td className="py-2 px-4 border-b">
-                                <button className="text-slate-500 mr-2 bg-slate-300 rounded p-1" onClick={() => handleRowClick(result.id)}>Edit</button>
-                                <button className="text-white bg-red-500 rounded p-1" onClick={() => handleDelete(result.id)}>Delete</button>
+                            <td className={tableRowStyle}>{result.participantName}</td>
+                            <td className={tableRowStyle}>{result.disciplineName}</td>
+                            <td className={tableRowStyle}>{result.formattedValue}</td>
+                            <td className={tableRowStyle}>{formatDate(result.date)}</td>
+                            <td className={tableRowStyle}>
+                                <Button
+                                    label="Edit"
+                                    variant="secondary"
+                                    onClick={() => handleEdit(result.id)}
+                                    className="mr-2"
+                                />
+                                <Button
+                                    label="Delete"
+                                    variant="danger"
+                                    onClick={() => handleDelete(result.id)}
+                                />
                             </td>
                         </tr>
                     ))}
