@@ -1,4 +1,4 @@
-import PageLayout from "../components/PageLayout.tsx";
+import PageLayout from "../components/pageLayout/PageLayout.tsx";
 
 const PageNotFound = () => {
     return (
