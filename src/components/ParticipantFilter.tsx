@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { Gender, AgeGroup } from '../enums';
 import cleanFilters from '../utils/cleanFilters';
+import Button from "./Button.tsx";
+import formatEnum from "../utils/formatEnum.ts";
 
 interface ParticipantFilterProps {
     onFilterChange: (filters: {
@@ -14,7 +16,7 @@ interface ParticipantFilterProps {
     }) => void;
 }
 
-const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange }) => {
+const ParticipantFilter = ({ onFilterChange }: ParticipantFilterProps) => {
     const [search, setSearch] = useState('');
     const [gender, setGender] = useState<Gender | undefined>(undefined);
     const [ageGroup, setAgeGroup] = useState<AgeGroup | undefined>(undefined);
@@ -36,6 +38,17 @@ const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange })
         onFilterChange(cleanFilters(filters));
     };
 
+    const handleFilterClear = () => {
+        setSearch('');
+        setGender(undefined);
+        setAgeGroup(undefined);
+        setClub('');
+        setDiscipline('');
+        setSortBy('');
+        setSortDirection('asc');
+        onFilterChange({});
+    };
+
     return (
         <div className="mb-4">
             <div className="flex flex-wrap gap-4">
@@ -43,12 +56,12 @@ const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange })
                     type="text"
                     placeholder="Search by name"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 />
                 <select
                     value={gender}
-                    onChange={(e) => setGender(e.target.value as Gender)}
+                    onChange={(e:ChangeEvent<HTMLSelectElement>) => setGender(e.target.value as Gender)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 >
                     <option value="">All Genders</option>
@@ -58,13 +71,13 @@ const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange })
                 </select>
                 <select
                     value={ageGroup}
-                    onChange={(e) => setAgeGroup(e.target.value as AgeGroup)}
+                    onChange={(e:ChangeEvent<HTMLSelectElement>) => setAgeGroup(e.target.value as AgeGroup)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 >
                     <option value="">All Age Groups</option>
                     {Object.values(AgeGroup).map((group) => (
                         <option key={group} value={group}>
-                            {group}
+                            {formatEnum(group)}
                         </option>
                     ))}
                 </select>
@@ -72,19 +85,19 @@ const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange })
                     type="text"
                     placeholder="Filter by club"
                     value={club}
-                    onChange={(e) => setClub(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setClub(e.target.value)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 />
                 <input
                     type="text"
                     placeholder="Filter by discipline"
                     value={discipline}
-                    onChange={(e) => setDiscipline(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setDiscipline(e.target.value)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 />
                 <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e:ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value)}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 >
                     <option value="">Sort By</option>
@@ -96,18 +109,22 @@ const ParticipantFilter: React.FC<ParticipantFilterProps> = ({ onFilterChange })
                 </select>
                 <select
                     value={sortDirection}
-                    onChange={(e) => setSortDirection(e.target.value as 'asc' | 'desc')}
+                    onChange={(e:ChangeEvent<HTMLSelectElement>) => setSortDirection(e.target.value as 'asc' | 'desc')}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 >
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
                 </select>
-                <button
+                <Button
                     onClick={handleFilterChange}
-                    className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                    Apply Filters
-                </button>
+                    label="Apply Filter"
+                    variant="primary"
+                />
+                <Button
+                    onClick={handleFilterClear}
+                    label="Clear Filter"
+                    variant="primary"
+                />
             </div>
         </div>
     );

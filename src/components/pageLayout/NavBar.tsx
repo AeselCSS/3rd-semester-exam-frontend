@@ -1,5 +1,5 @@
 import {useState} from "react";
-import { NavButton } from "./NavButton";
+import { NavButton } from "./NavButton.tsx";
 
 const NavBar = () => {
     const [selected, setSelected] = useState<string>(window.location.pathname);

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Gender, AgeGroup } from '../enums';
 import cleanFilters from '../utils/cleanFilters';
 import useDiscipline from '../hooks/useDiscipline';
 import { DisciplineResponseDTO } from '../shared.types';
+import Button from "./Button.tsx";
+import LoadingSpinner from "./LoadingSpinner.tsx";
 
 interface ResultFilterProps {
     onFilterChange: (filters: {
@@ -12,10 +14,10 @@ interface ResultFilterProps {
     }) => void;
 }
 
-const ResultFilter: React.FC<ResultFilterProps> = ({ onFilterChange }) => {
+const ResultFilter = ({ onFilterChange }:ResultFilterProps) => {
     const [gender, setGender] = useState<Gender | undefined>(undefined);
     const [ageGroup, setAgeGroup] = useState<AgeGroup | undefined>(undefined);
-    const [disciplineName, setDisciplineName] = useState<string | undefined>(undefined);
+    const [disciplineName, setDisciplineName] = useState<string>("all");
 
     const { useDisciplinesQuery } = useDiscipline();
     const { data: disciplines, isLoading: disciplinesLoading, error: disciplinesError } = useDisciplinesQuery();
@@ -24,17 +26,24 @@ const ResultFilter: React.FC<ResultFilterProps> = ({ onFilterChange }) => {
         const filters = {
             gender,
             ageGroup,
-            disciplineName,
+            disciplineName: disciplineName || "all", // Ensure default value is set
         };
         onFilterChange(cleanFilters(filters));
     };
 
+    const handleFilterClear = () => {
+        setGender(undefined);
+        setAgeGroup(undefined);
+        setDisciplineName("all");
+        onFilterChange({});
+    };
+
     if (disciplinesLoading) {
-        return <div>Loading...</div>;
+        return <LoadingSpinner />;
     }
 
     if (disciplinesError) {
-        return <div>Error loading disciplines</div>;
+        return <div>An Error occurred while loading disciplines.</div>;
     }
 
     return (
@@ -64,22 +73,26 @@ const ResultFilter: React.FC<ResultFilterProps> = ({ onFilterChange }) => {
                 </select>
                 <select
                     value={disciplineName}
-                    onChange={(e) => setDisciplineName(e.target.value)}
+                    onChange={(e) => setDisciplineName(e.target.value || "all")}
                     className="border border-gray-300 rounded-md shadow-sm py-2 px-3"
                 >
-                    <option value="">All Disciplines</option>
+                    <option value="all">All Disciplines</option>
                     {disciplines?.map((discipline: DisciplineResponseDTO) => (
                         <option key={discipline.id} value={discipline.name}>
                             {discipline.name}
                         </option>
                     ))}
                 </select>
-                <button
+                <Button
                     onClick={handleFilterChange}
-                    className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                    Apply Filters
-                </button>
+                    label="Apply Filters"
+                    variant="primary"
+                />
+                <Button
+                    onClick={handleFilterClear}
+                    label="Clear Filters"
+                    variant="primary"
+                />
             </div>
         </div>
     );

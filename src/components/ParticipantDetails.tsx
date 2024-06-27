@@ -3,6 +3,8 @@ import useParticipant from '../hooks/useParticipant';
 import formatEnum from '../utils/formatEnum';
 import { DisciplineResponseDTO } from '../shared.types';
 import useDiscipline from '../hooks/useDiscipline';
+import Button from "./Button.tsx";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 interface ParticipantDetailsProps {
     participantId: number;
@@ -51,7 +53,11 @@ const ParticipantDetails: React.FC<ParticipantDetailsProps> = ({ participantId, 
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Participant Details</h2>
-                <button onClick={onClose} className="text-red-500">Close</button>
+                <Button
+                    onClick={onClose}
+                    label="X"
+                    variant="close"
+                />
             </div>
             {participant && (
                 <div>
@@ -66,12 +72,12 @@ const ParticipantDetails: React.FC<ParticipantDetailsProps> = ({ participantId, 
                         {participant.disciplines.map((discipline) => (
                             <li key={discipline} className="flex items-center justify-between">
                                 {discipline}
-                                <button
+                                <Button
                                     onClick={() => handleRemoveDiscipline(discipline)}
-                                    className="text-red-500 ml-4"
-                                >
-                                    Remove
-                                </button>
+                                    label={<FaRegTrashCan size={14}/>}
+                                    variant="danger"
+                                    className="mb-2"
+                                />
                             </li>
                         ))}
                     </ul>
@@ -88,20 +94,19 @@ const ParticipantDetails: React.FC<ParticipantDetailsProps> = ({ participantId, 
                                 </option>
                             ))}
                         </select>
-                        <button
+                        <Button
                             onClick={handleAddDiscipline}
-                            className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
-                        >
-                            Add Discipline
-                        </button>
+                            label="Add"
+                            variant="primary"
+                        />
                     </div>
-                    <div className="flex justify-end mt-4">
-                        <button
+                    <h2 className="text-xl font-bold mt-6">Danger Zone</h2>
+                    <div className="flex justify-start mt-4">
+                        <Button
                             onClick={handleDelete}
-                            className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-                        >
-                            Delete Participant
-                        </button>
+                            label="Delete Participant"
+                            variant="danger"
+                        />
                     </div>
                 </div>
             )}

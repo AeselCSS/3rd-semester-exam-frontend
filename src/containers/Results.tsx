@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import Modal from '../components/Modal';
 import ResultForm from '../components/ResultForm';
 import MultipleResultsForm from '../components/MultipleResultsForm';
 import ResultFilter from '../components/ResultFilter';
 import ResultTable from '../components/ResultTable';
 import { Gender, AgeGroup } from '../enums';
-import PageLayout from "../components/PageLayout.tsx";
+import PageLayout from "../components/pageLayout/PageLayout.tsx";
+import Button from '../components/Button.tsx'; // Import the Button component
 
-const ResultsContainer: React.FC = () => {
+const ResultsContainer = () => {
     const [isSingleResultModalOpen, setIsSingleResultModalOpen] = useState(false);
     const [isMultipleResultsModalOpen, setIsMultipleResultsModalOpen] = useState(false);
     const [filters, setFilters] = useState<{ gender?: Gender; ageGroup?: AgeGroup; disciplineName?: string }>({});
@@ -37,19 +38,17 @@ const ResultsContainer: React.FC = () => {
     return (
         <PageLayout>
             <ResultFilter onFilterChange={handleFilterChange} />
-            <div className="flex justify-between mb-4">
-                <button
+            <div className="flex gap-4 mb-4">
+                <Button
                     onClick={handleOpenSingleResultModal}
-                    className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                    Add Result
-                </button>
-                <button
+                    label="Add Result"
+                    variant="primary"
+                />
+                <Button
                     onClick={handleOpenMultipleResultsModal}
-                    className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                    Add Multiple Results
-                </button>
+                    label="Add Multiple Results"
+                    variant="primary"
+                />
             </div>
             <ResultTable filters={{...filters, disciplineName: filters.disciplineName || ''}} />
             {isSingleResultModalOpen && (

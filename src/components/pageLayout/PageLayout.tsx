@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import  Footer from "./Footer"
+import  Footer from "./Footer.tsx"
 import Header from "./Header.tsx";
 import NavBar from "./NavBar.tsx";
 

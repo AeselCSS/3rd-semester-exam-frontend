@@ -17,7 +17,7 @@ interface ParticipantTableProps {
     };
 }
 
-const ParticipantTable = ({ filters }:ParticipantTableProps) => {
+const ParticipantTable = ({ filters }: ParticipantTableProps) => {
     const { useParticipantsQuery } = useParticipant();
     const { data: participants, error, isLoading } = useParticipantsQuery(filters);
 
@@ -39,6 +39,10 @@ const ParticipantTable = ({ filters }:ParticipantTableProps) => {
         return <div className="text-red-500">Error: {error.message}</div>;
     }
 
+    if (participants?.length === 0) {
+        return <div className="text-slate-700">No participants found</div>;
+    }
+
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Participants</h1>
@@ -46,13 +50,13 @@ const ParticipantTable = ({ filters }:ParticipantTableProps) => {
                 <table className="min-w-full bg-white border border-gray-200">
                     <thead className="bg-gray-100">
                     <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Full Name</th>
-                        <th className="py-2 px-4 border-b">Gender</th>
-                        <th className="py-2 px-4 border-b">Age</th>
-                        <th className="py-2 px-4 border-b">Age Group</th>
-                        <th className="py-2 px-4 border-b">Club</th>
-                        <th className="py-2 px-4 border-b">Disciplines</th>
+                        <th className="py-2 px-4 border-b text-left">ID</th>
+                        <th className="py-2 px-4 border-b text-left">Full Name</th>
+                        <th className="py-2 px-4 border-b text-left">Gender</th>
+                        <th className="py-2 px-4 border-b text-left">Age</th>
+                        <th className="py-2 px-4 border-b text-left">Age Group</th>
+                        <th className="py-2 px-4 border-b text-left">Club</th>
+                        <th className="py-2 px-4 border-b text-left">Disciplines</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -62,13 +66,13 @@ const ParticipantTable = ({ filters }:ParticipantTableProps) => {
                             className="hover:bg-gray-50 cursor-pointer"
                             onClick={() => handleRowClick(participant.id)}
                         >
-                            <td className="py-2 px-4 border-b">{participant.id}</td>
-                            <td className="py-2 px-4 border-b">{participant.fullName}</td>
-                            <td className="py-2 px-4 border-b">{formatEnum(participant.gender)}</td>
-                            <td className="py-2 px-4 border-b">{participant.age}</td>
-                            <td className="py-2 px-4 border-b">{formatEnum(participant.ageGroup)}</td>
-                            <td className="py-2 px-4 border-b">{participant.club}</td>
-                            <td className="py-2 px-4 border-b">{participant.disciplines.join(', ')}</td>
+                            <td className="py-2 px-4 border-b text-left">{participant.id}</td>
+                            <td className="py-2 px-4 border-b text-left">{participant.fullName}</td>
+                            <td className="py-2 px-4 border-b text-left">{formatEnum(participant.gender)}</td>
+                            <td className="py-2 px-4 border-b text-left">{participant.age}</td>
+                            <td className="py-2 px-4 border-b text-left">{formatEnum(participant.ageGroup)}</td>
+                            <td className="py-2 px-4 border-b text-left">{participant.club}</td>
+                            <td className="py-2 px-4 border-b text-left">{participant.disciplines.join(', ')}</td>
                         </tr>
                     ))}
                     </tbody>

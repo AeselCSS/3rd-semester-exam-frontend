@@ -50,4 +50,5 @@ export interface DisciplineResponseDTO {
     name: string;
     disciplineType: DisciplineType;
     resultType: ResultType;
+    participants: string[];
 }
