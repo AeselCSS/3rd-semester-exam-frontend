@@ -61,7 +61,7 @@ const useParticipant = () => {
     const useAddDisciplineMutation = () => useMutation<ParticipantResponseDTO, Error, { id: number, discipline: string }>({
         mutationFn: addDiscipline,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            queryClient.invalidateQueries({ queryKey: ['participant'] });
             toast.success('Discipline added successfully');
         },
     });
@@ -69,7 +69,7 @@ const useParticipant = () => {
     const useRemoveDisciplineMutation = () => useMutation<ParticipantResponseDTO, Error, { id: number, discipline: string }>({
         mutationFn: removeDiscipline,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['participants'] });
+            queryClient.invalidateQueries({ queryKey: ['participant'] });
             toast.success('Discipline removed successfully');
         },
     });
