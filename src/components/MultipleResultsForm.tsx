@@ -107,8 +107,9 @@ const MultipleResultsForm = ({ onClose }: MultipleResultsFormProps) => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Discipline</label>
+                <label htmlFor="discipline" className="block text-sm font-medium text-gray-700">Discipline</label>
                 <select
+                    id="discipline"
                     value={selectedDiscipline}
                     onChange={handleDisciplineChange}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
@@ -123,8 +124,9 @@ const MultipleResultsForm = ({ onClose }: MultipleResultsFormProps) => {
                 </select>
             </div>
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Date</label>
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date</label>
                 <input
+                    id="date"
                     type="date"
                     value={date}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)}
@@ -133,8 +135,9 @@ const MultipleResultsForm = ({ onClose }: MultipleResultsFormProps) => {
                 />
             </div>
             <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Participants</label>
+                <label htmlFor="participants" className="block text-sm font-medium text-gray-700">Participants</label>
                 <select
+                    id="participants"
                     multiple
                     value={selectedParticipants.map(String)}
                     onChange={handleParticipantChange}
