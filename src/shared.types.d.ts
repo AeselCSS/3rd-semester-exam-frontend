@@ -1,3 +1,4 @@
+
 import { DisciplineType, AgeGroup, Gender, ResultType } from "./enums";
 
 export interface ParticipantRequestDTO {
