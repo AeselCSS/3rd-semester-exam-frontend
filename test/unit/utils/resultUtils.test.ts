@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatValue, parseFormattedValue } from "./resultUtils"
-import { ResultType } from "../enums";
+import { formatValue, parseFormattedValue } from "../../../src/utils/resultUtils"
+import { ResultType } from "../../../src/enums";
 
 describe("formatValue", () => {
     it("should format TIME correctly", () => {

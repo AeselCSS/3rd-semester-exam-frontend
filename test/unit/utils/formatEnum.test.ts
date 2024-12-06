@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import formatEnum from "./formatEnum";
+import formatEnum from "../../../src/utils/formatEnum";
 
 describe("formatEnum", () => {
     it("should format an enum value with underscores to a title-cased string", () => {

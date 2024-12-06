@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import cleanFilters from "./cleanFilters";
+import cleanFilters from "../../../src/utils/cleanFilters";
 
 describe("cleanFilters", () => {
     it("should remove keys with undefined values", () => {
