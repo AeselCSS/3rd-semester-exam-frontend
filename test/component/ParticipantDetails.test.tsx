@@ -1,4 +1,3 @@
-// test/components/ParticipantDetails.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '../setup/test-utils';
 import ParticipantDetails from '../../src/components/ParticipantDetails';
