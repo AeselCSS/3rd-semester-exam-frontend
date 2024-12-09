@@ -2,13 +2,31 @@ import React from 'react';
 import { render, RenderOptions, within } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, RenderHookOptions } from '@testing-library/react';
 
-// Enhanced version of your AllTheProviders
+// Create a client for testing
+const createTestQueryClient = () => new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,  // Disable retries for tests
+            gcTime: 0,    // Clear cache immediately
+            staleTime: 0, // Always consider data stale
+            refetchOnWindowFocus: false,
+        },
+    },
+});
+
+// Enhanced AllTheProviders with React Query
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+    const testQueryClient = createTestQueryClient();
+
     return (
-        <BrowserRouter>
-            {children}
-        </BrowserRouter>
+        <QueryClientProvider client={testQueryClient}>
+            <BrowserRouter>
+                {children}
+            </BrowserRouter>
+        </QueryClientProvider>
     );
 };
 
@@ -29,6 +47,20 @@ const customRender = (
     };
 };
 
+// Custom renderHook with same providers
+function customRenderHook<Result, Props>(
+    render: (initialProps: Props) => Result,
+    options?: Omit<RenderHookOptions<Props>, 'wrapper'> & { route?: string }
+) {
+    const { route = '/', ...renderOptions } = options || {};
+    window.history.pushState({}, 'Test page', route);
+
+    return renderHook(render, {
+        wrapper: AllTheProviders,
+        ...renderOptions,
+    });
+}
+
 // Custom queries
 const findTableCell = async (container: HTMLElement, columnName: string, rowText: string) => {
     const table = within(container).getByRole('table');
@@ -47,4 +79,4 @@ const findTableCell = async (container: HTMLElement, columnName: string, rowText
 };
 
 export * from '@testing-library/react';
-export { customRender as render, findTableCell };
+export { customRender as render, customRenderHook as renderHook, findTableCell };
