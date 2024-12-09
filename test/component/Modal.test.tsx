@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Modal from './Modal';
+import Modal from '../../src/components/Modal';
 
 describe('Modal', () => {
     it('renders children content', () => {

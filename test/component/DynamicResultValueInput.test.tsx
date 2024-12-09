@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DynamicResultValueInput from './DynamicResultValueInput';
-import { ResultType } from '../enums';
+import DynamicResultValueInput from '../../src/components/DynamicResultValueInput';
+import { ResultType } from '../../src/enums';
 
 describe('DynamicResultValueInput', () => {
     it('formats running time correctly', () => {
